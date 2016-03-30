@@ -1,12 +1,19 @@
 package core;
 
+import mt.NImg;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class Core {
-	public static final String AKICHIJ_VERSION = "akichJ Version 0.3.3e";
+public class Core{
+	public static final String AKICHIJ_VERSION = "akichJ version 0.4.0";
+	public static final boolean SUCCESS = true;
+	public static final boolean FAILED = false;
+
 	public static int IDs = 0;
 	public static Point Point(int x,int y){
 		Point P = new Point(x,y);
@@ -39,19 +46,31 @@ public class Core {
     public static int argb(int a,int r,int g,int b){
         return a<<24 | r <<16 | g <<8 | b;
     }
-    //Stdimageオブジェクトの生成
-	public static Stdim readim(String filename){
-    	Stdim img = new Stdim();
+
+
+	public static Stdim readStdim(String filename){
     	File f = new File(filename);
-    	BufferedImage im = null;
+    	Stdim img = null;
 		try {
-			im = ImageIO.read(f);
+			img = new Stdim(ImageIO.read(f));
+		} catch (IOException e) {
+			System.out.println("Not Found " + filename);
+		}
+    	return img;
+    }
+
+
+	public static NImg readNImg(String filename){
+		File f = new File(filename);
+		NImg img = null;
+		try {
+			img = new NImg(ImageIO.read(f));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	img.setImg(im);
-    	return img; 
-    }
+		return img;
+	}
+
     public static void saveim(Stdim img,String filename,String format){
     	File out = new File(filename);
 		try {
@@ -83,8 +102,60 @@ public class Core {
 			quickSort(arr, l, right);
 		}
 	}
+	public static BufferedImage cvtStdim2BI(Stdim img){
+		return img.getImg();
+	}
+
+	public static BufferedImage cvtNImg2BI(NImg img){
+		BufferedImage im = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
+		for(int y = 0;y < img.getHeight();y++){
+			for(int x = 0;x < img.getWidth();x++){
+				im.setRGB(x, y, Core.rgb(img.getImageArray()[x][y][0], img.getImageArray()[x][y][1], img.getImageArray()[x][y][2]));
+			}
+		}
+		return im;
+	}
+
+	public static Stdim getCleannessImage(int width, int height){
+		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2D = img.createGraphics();
+		g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f));
+		Rectangle2D.Double rect = new Rectangle2D.Double(0,0,img.getHeight(),img.getHeight());
+		g2D.fill(rect);
+		g2D.setPaintMode();
+		Stdim stdim = new Stdim(img);
+		return stdim;
+	}
+
+	public static Stdim getWhiteStdim(int width, int height){
+		BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Stdim img = new Stdim(bufferedImage);
+		for(int y = 0;y < img.getHeight();y++){
+			for(int x = 0;x < img.getWidth();x++){
+				int rgb = Core.rgb(255,255,255);
+				img.getImg().setRGB(x, y, rgb);
+			}
+		}
+		return img;
+	}
 }
-class Color{
+
+class Point{
+	int x;
+	int y;
+	public Point(int x,int y){
+		this.x = x;
+		this.y = y;
+	}
+	public int getX(){
+		return this.x;
+	}
+	public int getY(){
+		return this.y;
+	}
+}
+
+class Color {
 	private int red;
 	private int green;
 	private int blue;
@@ -103,20 +174,7 @@ class Color{
 		return this.blue;
 	}
 }
-class Point{
-	int x;
-	int y;
-	public Point(int x,int y){
-		this.x = x;
-		this.y = y;
-	}
-	public int getX(){
-		return this.x;
-	}
-	public int getY(){
-		return this.y;
-	}
-}
+
 class Size{
     int height;
     int width;
@@ -131,7 +189,6 @@ class Size{
         return this.width;
     }
 	public void freeim(Stdim img){img =null;}
-	public void freemat(Matrix mat){mat = null;}
 	public void copyim(Stdim... args){
 		Stdim newim = args[0].clone();
 		for (Stdim  img : args) {
@@ -139,4 +196,5 @@ class Size{
 		}
 	}
 }
+
 

@@ -1131,4 +1131,5 @@ public class ImageProcessing {
         y[1] = y[0] * -1;
         return y;
     }
+
 }

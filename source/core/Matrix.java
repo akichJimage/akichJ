@@ -19,20 +19,20 @@ public class Matrix {
     private int channels;
     private int depth;
     public Matrix(int width,int height,int channels,int depth){
-                mat = new int[width][height][channels];
-                for(int i = 0;i < width;i++){
-                    for(int n = 0;n < height;n++){
-                        for(int m = 0;m < channels;m++){
-                            mat[i][n][m] = 0;
-                        }
-                    }
-                
+        mat = new int[width][height][channels];
+        for(int i = 0;i < width;i++){
+            for(int n = 0;n < height;n++){
+                for(int m = 0;m < channels;m++){
+                    mat[i][n][m] = 0;
+                }
             }
-                this.channels = channels;
-                this.height = height;
-                this.width = width;
-                this.depth = depth;
+
         }
+        this.channels = channels;
+        this.height = height;
+        this.width = width;
+        this.depth = depth;
+    }
     
     public Matrix(Stdim img){
         mat = new int[img.getWidth()][img.getHeight()][img.getType()];
